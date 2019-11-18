@@ -1,0 +1,58 @@
+h42919
+s 00034/00000/00000
+d D 1.1 94/11/18 01:26:35 lm 2 1
+c Initial revision
+cC
+e
+s 00000/00000/00000
+d D 1.0 94/11/18 01:26:34 lm 1 0
+cHlm.bitmover.com
+cPdoc/lat_connect.8
+cR2b29d3e2c9189258
+cZ-08:00
+c______________________________________________________________________
+e
+u
+U
+f e 0
+f b
+f x 34
+t
+lmbench doc checkin
+T
+I 2
+.\" $Id$
+.TH LAT_CONNECT 8 "$Date$" "(c)1994 Larry McVoy" "LMBENCH"
+.SH NAME
+lat_connect \- measure interprocess connection latency via TCP/IP
+.SH SYNOPSIS
+.B lat_connect
+.I -s
+.sp .5
+.B lat_connect
+.I hostname
+.sp .5
+.B lat_connect
+.I -hostname
+.SH DESCRIPTION
+.B lat_connect
+is a client/server program that measures interprocess
+connection latencies.   The benchmark times the creation and connection of
+an AF_INET (aka TCP/IP) socket to a remote server.  Care is take that the
+connection time does not include any other overhead, such as the
+\fIgethostbyname()\fP or remote port lookups since these add more overhead
+than the connection establishment itself.
+.LP
+.B lat_connect
+has three forms of usage: as a server (-s), as a client (lat_connect localhost),
+and as a shutdown (lat_connect -localhost).
+.SH OUTPUT
+The reported time is in microseconds per connection.
+Output format is like so
+.sp
+.ft CB
+TCP/IP connection cost to localhost: 1006 microseconds
+.ft
+.SH "SEE ALSO"
+lmbench(8).
+E 2

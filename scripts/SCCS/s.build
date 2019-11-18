@@ -1,0 +1,179 @@
+h23563
+s 00041/00028/00026
+d D 1.3 00/07/31 16:41:11 staelin 4 3
+c - replace code that searches for $MAKE with call to scripts/make
+c - Change tmp filename pattern from $$ to /tmp/dummy$$
+c - Add separate checks for -nsl and -socket
+c - Add check for RUSAGE
+cC
+cK59785
+e
+s 00007/00002/00047
+d D 1.2 00/06/27 17:41:20 staelin 3 2
+c - Slight tweak to "-lnsl -lsocket" test
+cC
+cK47318
+e
+s 00049/00000/00000
+d D 1.1 00/06/27 14:21:20 staelin 2 1
+cC
+cF1
+cK34461
+cO-rwxrwxr-x
+e
+s 00000/00000/00000
+d D 1.0 00/06/27 14:21:20 staelin 1 0
+c BitKeeper file /tmp_mnt/usr/WebPaper/users/staelin/src/LMbench2/scripts/build
+cBlm@lm.bitmover.com|ChangeSet|20000131225335|47351|3dc34c3db8deb0af
+cHhpli8.hpli.hpl.hp.com
+cK02240
+cPscripts/build
+cR2e577c9d312058c8
+cV3
+cX0xa1
+cZ+03:00
+c______________________________________________________________________
+e
+u
+U
+f e 0
+f x 0xa1
+t
+T
+I 2
+#!/bin/sh
+
+CC=`../scripts/compiler`
+I 4
+MAKE=`../scripts/make`
+E 4
+OS=`../scripts/os`
+TARGET=`../scripts/target`
+BINDIR="../bin/${OS}"
+CONFIG="../bin/${OS}/`../scripts/config`"
+
+D 4
+# figure out which make to use
+if [ X$MAKE = X ]
+then    MAKE=make
+        for p in `echo $PATH | sed 's/:/ /g'`
+        do      if [ -x $p/gmake ]
+                then    MAKE=gmake
+                fi
+        done
+fi
+E 4
+I 4
+trap 'rm -f /tmp/dummy$$.s /tmp/dummy$$.c /tmp/dummy$$.o /tmp/dummy$$; exit 1' 1 2 15
+E 4
+
+# check for HP-UX's ANSI compiler
+if [ X$CC = "Xcc" ]
+then
+D 4
+	echo "main(int ac, char *av[]) { int i; }" > $$.c
+	${CC} -o $$ $$.c 1>/dev/null 2>/dev/null || CFLAGS="${CFLAGS} -Ae"
+	rm -f $$ $$.c
+E 4
+I 4
+	echo "main(int ac, char *av[]) { int i; }" > /tmp/dummy$$.c
+	${CC} -o /tmp/dummy$$ /tmp/dummy$$.c 1>/dev/null 2>/dev/null || CFLAGS="${CFLAGS} -Ae"
+	rm -f /tmp/dummy$$ /tmp/dummy$$.c
+E 4
+fi
+	
+# check for bcopy (optionally set the SYS5 flag)
+D 4
+echo "#include <string.h>" > $$.c
+echo "main() { char buf1[256]; char buf2[256]; bcopy(buf1, buf2, 256); }" >> $$.c
+${CC} -o $$ $$.c 1>/dev/null 2>/dev/null || CFLAGS="${CFLAGS} -DSYS5"
+rm -f $$ $$.c
+E 4
+I 4
+echo "#include <string.h>" > /tmp/dummy$$.c
+echo "main() { char buf1[256]; char buf2[256]; bcopy(buf1, buf2, 256); }" >> /tmp/dummy$$.c
+${CC} -o /tmp/dummy$$ /tmp/dummy$$.c 1>/dev/null 2>/dev/null || CFLAGS="${CFLAGS} -DSYS5"
+rm -f /tmp/dummy$$ /tmp/dummy$$.c
+E 4
+
+# check for valloc
+D 4
+echo "#include <stdlib.h>" > $$.c
+echo "main() { char* buf = valloc(123); }" >> $$.c
+${CC} -o $$ $$.c 1>/dev/null 2>/dev/null || CFLAGS="${CFLAGS} -Dvalloc=malloc"
+rm -f $$ $$.c
+
+# check for -lnsl -lsocket
+D 3
+echo "main() { int i; }" >> $$.c
+${CC} -o $$ $$.c -lnsl -lsocket 1>/dev/null 2>/dev/null && LDLIBS="${LDLIBS} -lnsl -lsocket"
+E 3
+I 3
+echo "extern int callrpc(); main() { callrpc(); }" > $$.c
+if ${CC} -o $$ $$.c 1>/dev/null 2>/dev/null; then
+E 4
+I 4
+echo "#include <stdlib.h>" > /tmp/dummy$$.c
+echo "main() { char* buf = valloc(123); }" >> /tmp/dummy$$.c
+${CC} -o /tmp/dummy$$ /tmp/dummy$$.c 1>/dev/null 2>/dev/null || CFLAGS="${CFLAGS} -Dvalloc=malloc"
+rm -f /tmp/dummy$$ /tmp/dummy$$.c
+
+# check for getrusage
+echo "#include <sys/types.h>" > /tmp/dummy$$.c
+echo "#include <sys/time.h>" >> /tmp/dummy$$.c
+echo "#include <sys/resource.h>" >> /tmp/dummy$$.c
+echo "#ifndef RUSAGE_SELF" >> /tmp/dummy$$.c
+echo "#define RUSAGE_SELF 0" >> /tmp/dummy$$.c
+echo "#endif /* RUSAGE_SELF */" >> /tmp/dummy$$.c
+echo "main() { struct rusage ru; getrusage(RUSAGE_SELF, &ru); }" >> /tmp/dummy$$.c
+${CC} -o /tmp/dummy$$ /tmp/dummy$$.c 1>/dev/null 2>/dev/null && CFLAGS="${CFLAGS} -DRUSAGE"
+rm -f /tmp/dummy$$ /tmp/dummy$$.c
+
+# check for -lnsl
+echo "extern int pmap_getport(); main() { pmap_getport(); }" > /tmp/dummy$$.c
+if ${CC} -o /tmp/dummy$$ /tmp/dummy$$.c 1>/dev/null 2>/dev/null; then
+	true;
+else
+	${CC} -o /tmp/dummy$$ /tmp/dummy$$.c -lnsl 1>/dev/null 2>/dev/null && LDLIBS="${LDLIBS} -lnsl"
+fi
+rm -f /tmp/dummy$$ /tmp/dummy$$.c
+
+
+# check for -lsocket
+echo "extern void* getservent(); main() { getservent(); }" > /tmp/dummy$$.c
+if ${CC} -o /tmp/dummy$$ /tmp/dummy$$.c 1>/dev/null 2>/dev/null; then
+E 4
+	true;
+else
+D 4
+	${CC} -o $$ $$.c -lnsl -lsocket 1>/dev/null 2>/dev/null && LDLIBS="${LDLIBS} -lnsl -lsocket"
+E 4
+I 4
+	${CC} -o /tmp/dummy$$ /tmp/dummy$$.c -lsocket 1>/dev/null 2>/dev/null && LDLIBS="${LDLIBS} -lsocket"
+E 4
+fi
+E 3
+D 4
+rm -f $$ $$.c
+E 4
+I 4
+rm -f /tmp/dummy$$ /tmp/dummy$$.c
+E 4
+
+
+# echo Building for $(TARGET)
+if [ ! -d ${BINDIR} ]; then mkdir -p ${BINDIR}; fi
+
+# now go ahead and build everything!
+I 3
+D 4
+echo ${MAKE} CC="${CC}" CFLAGS="${CFLAGS}" LDLIBS="${LDLIBS}" O="${BINDIR}" all
+E 3
+${MAKE} CC="${CC}" CFLAGS="${CFLAGS}" LDLIBS="${LDLIBS}" O="${BINDIR}" all
+E 4
+I 4
+${MAKE} CC="${CC}" CFLAGS="${CFLAGS}" LDLIBS="${LDLIBS}" O="${BINDIR}" $*
+E 4
+E 2
+I 1
+E 1

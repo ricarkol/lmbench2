@@ -1,0 +1,5 @@
+BitKeeper/etc/csets
+bin/*/*
+results/*/*
+src/bk.ver
+src/tags

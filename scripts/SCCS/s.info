@@ -1,0 +1,37 @@
+h35429
+s 00000/00000/00007
+d D 1.2 00/01/31 15:29:42 lm 3 2
+c Change mode to -rwxrwxr-x
+cC
+cO-rwxrwxr-x
+cZ-08:00
+e
+s 00007/00000/00000
+d D 1.1 97/06/15 19:55:54 lm 2 1
+c Initial revision
+cC
+e
+s 00000/00000/00000
+d D 1.0 97/06/15 19:55:53 lm 1 0
+cHlm.bitmover.com
+cPscripts/info
+cR983152f24ab0d3f9
+cZ-07:00
+c______________________________________________________________________
+e
+u
+U
+f e 0
+f b
+f x 34
+t
+T
+I 2
+#!/bin/sh
+
+UNAME=`uname -n 2>/dev/null`
+if [ X$UNAME = X ]
+then	echo INFO
+else	echo INFO.$UNAME
+fi
+E 2

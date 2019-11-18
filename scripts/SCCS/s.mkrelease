@@ -1,0 +1,53 @@
+h03736
+s 00000/00000/00023
+d D 1.2 00/01/31 15:29:42 lm 3 2
+c Change mode to -rwxrwxr-x
+cC
+cHlm.bitmover.com
+cO-rwxrwxr-x
+cZ-08:00
+e
+s 00023/00000/00000
+d D 1.1 98/06/08 22:58:27 lm 2 1
+c mkrelease created on 98/06/08 22:58:27 by lm
+cC
+e
+s 00000/00000/00000
+d D 1.0 98/06/08 22:58:26 lm 1 0
+cHbitmover
+cPscripts/mkrelease
+cR8ca5c15a85807840
+cZ-07:00
+c______________________________________________________________________
+e
+u
+U
+f e 0
+f x 32
+t
+T
+I 2
+#!/bin/sh
+
+# %W%
+#
+# XXX - does not check for checked out files.
+
+make -s clean
+make -s get
+VERS=`egrep 'MAJOR|MINOR' src/version.h | awk '{print $3}'` 
+set `echo $VERS`
+if [ $2 -lt 0 ] 
+then	VERS=`echo $1$2 | sed s/-/alpha/`
+else	VERS=`echo $VERS |sed 's/ /./'`
+fi
+D=lmbench-$VERS
+mkdir $D $D/results
+cp -rp SCCS doc hbench-REBUTTAL lmbench-HOWTO scripts src $D
+cp -rp results/SCCS $D/results
+(cd $D && make -s get)
+/bin/rm -rf $D/SCCS $D/*/SCCS
+tar czvf $D.tgz $D
+/bin/rm -rf $D
+make -s clean
+E 2

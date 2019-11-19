@@ -96,22 +96,10 @@ typedef unsigned char bool_t;
 #define	rindex(s, c)	strrchr(s, c)
 #endif
 #define	streq		!strcmp
+#define gettime		usecs_spent
+
+
 #define	ulong		unsigned long
-
-
-static inline long long timespec_to_ns(const struct timespec *ts)
-{
-        return ((long long) ts->tv_sec * UM_NSEC_PER_SEC) + ts->tv_nsec;
-}
-
-
-inline long long gettime2(void)
-{
-        struct timespec ts;
-
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        return timespec_to_ns(&ts);
-}
 
 
 #ifdef WIN32

@@ -25,7 +25,7 @@ void do_shell(void)
 {
 	int	pid;
 
-	switch (pid = fork()) {
+	switch (pid = vfork()) {
 	    case -1:
 		perror("fork");
 		exit(1);
@@ -48,7 +48,7 @@ void do_forkexec(void)
 
 	nav[0] = PROG;
 	nav[1] = 0;
-	switch (pid = fork()) {
+	switch (pid = vfork()) {
 	    case -1:
 		perror("fork");
 		exit(1);
@@ -68,7 +68,7 @@ void do_fork(void)
 {
 	int	pid;
 
-	switch (pid = fork()) {
+	switch (pid = vfork()) {
 	    case -1:
 		perror("fork");
 		exit(1);

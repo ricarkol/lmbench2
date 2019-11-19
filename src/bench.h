@@ -95,9 +95,24 @@ typedef unsigned char bool_t;
 #define	bcopy(s, d, l)	memcpy(d, s, l)
 #define	rindex(s, c)	strrchr(s, c)
 #endif
-#define	gettime		usecs_spent
 #define	streq		!strcmp
 #define	ulong		unsigned long
+
+
+static inline long long timespec_to_ns(const struct timespec *ts)
+{
+        return ((long long) ts->tv_sec * UM_NSEC_PER_SEC) + ts->tv_nsec;
+}
+
+
+inline long long gettime2(void)
+{
+        struct timespec ts;
+
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        return timespec_to_ns(&ts);
+}
+
 
 #ifdef WIN32
 #include <process.h>
